@@ -1,0 +1,27 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+data = pd.read_csv('titanic.csv')
+
+numerical_columns = ['Age', 'Fare']
+df = data[numerical_columns].dropna()
+
+corr_matrix = df.corr()
+print("Correlation Matrix:\n", corr_matrix)
+
+cov_matrix = df.cov()
+print("\nCovariance Matrix:\n", cov_matrix)
+
+plt.figure(figsize=(6, 4))
+sns.scatterplot(x=df['Age'], y=df['Fare'])
+plt.xlabel('Age')
+plt.ylabel('Fare')
+plt.title('Scatter Plot: Age vs Fare')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt=".2f")
+plt.title('Correlation Matrix Heatmap')
+plt.show()

@@ -1,0 +1,36 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+
+iris = load_iris()
+data = pd.DataFrame(iris.data, columns=iris.feature_names)
+
+X = data[['sepal width (cm)']]
+y = data['sepal length (cm)']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+def locally_weighted_regression(X_train, y_train, X_test, tau=1.0):
+    m = X_train.shape[0]
+    y_pred = np.zeros(X_test.shape[0])
+    for i in range(X_test.shape[0]):
+        weights = np.exp(-np.sum((X_train - X_test.iloc[i]) ** 2, axis=1) / (2 * tau ** 2))
+        X_weighted = X_train * weights[:, np.newaxis]
+        y_weighted = y_train * weights
+        X_weighted_transpose = X_weighted.T
+        theta = np.linalg.inv(X_weighted_transpose @ X_weighted) @ X_weighted_transpose @ y_weighted
+        y_pred[i] = np.dot(X_test.iloc[i], theta)
+    return y_pred
+
+y_pred = locally_weighted_regression(X_train, y_train, X_test, tau=1.0)
+
+plt.scatter(X_train, y_train, color='blue', label='Training data')
+plt.scatter(X_test, y_test, color='red', label='Test data')
+plt.plot(X_test, y_pred, color='green', label='Locally Weighted Regression')
+plt.xlabel('Sepal Width (cm)')
+plt.ylabel('Sepal Length (cm)')
+plt.legend()
+plt.title('Locally Weighted Regression on Iris Dataset')
+plt.show()
